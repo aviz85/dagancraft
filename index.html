@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Minecraft Clone</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Game Container -->
+    <div id="game-container"></div>
+    
+    <!-- User Interface -->
+    <div id="ui-container">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="ui-screen">
+            <div class="loading-content">
+                <h1>Loading World...</h1>
+                <div class="progress-bar">
+                    <div id="loading-progress" class="progress"></div>
+                </div>
+                <p id="loading-text">Preparing terrain...</p>
+            </div>
+        </div>
+        
+        <!-- Main Menu -->
+        <div id="main-menu" class="ui-screen">
+            <div class="menu-content">
+                <h1>Minecraft Clone</h1>
+                <div class="menu-buttons">
+                    <button id="start-game" class="menu-button">Start Game</button>
+                    <button id="load-game" class="menu-button">Load Game</button>
+                    <button id="options" class="menu-button">Options</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pause Menu -->
+        <div id="pause-menu" class="ui-screen">
+            <div class="menu-content">
+                <h1>Game Paused</h1>
+                <div class="menu-buttons">
+                    <button id="resume-game" class="menu-button">Resume Game</button>
+                    <button id="pause-options" class="menu-button">Options</button>
+                    <button id="save-world" class="menu-button">Save World</button>
+                    <button id="exit-game" class="menu-button">Exit to Menu</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Options Menu -->
+        <div id="options-menu" class="ui-screen">
+            <div class="menu-content">
+                <h1>Options</h1>
+                <div class="options-tabs">
+                    <button class="tab-button active" data-tab="graphics">Graphics</button>
+                    <button class="tab-button" data-tab="controls">Controls</button>
+                    <button class="tab-button" data-tab="audio">Audio</button>
+                    <button class="tab-button" data-tab="gameplay">Gameplay</button>
+                </div>
+                
+                <div class="tab-content" id="graphics-tab">
+                    <div class="option-row">
+                        <label for="render-distance">Render Distance</label>
+                        <input type="range" id="render-distance" data-setting="graphics.renderDistance" min="2" max="16" step="1">
+                        <span class="value-display">6 chunks</span>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="fog-enabled">Fog</label>
+                        <input type="checkbox" id="fog-enabled" data-setting="graphics.fogEnabled">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="shadows">Shadows</label>
+                        <input type="checkbox" id="shadows" data-setting="graphics.shadows">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="shadow-quality">Shadow Quality</label>
+                        <select id="shadow-quality" data-setting="graphics.shadowQuality">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="particles">Particles</label>
+                        <input type="checkbox" id="particles" data-setting="graphics.particles">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="fov">Field of View</label>
+                        <input type="range" id="fov" data-setting="graphics.fov" min="60" max="110" step="1">
+                        <span class="value-display">75°</span>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="controls-tab" style="display: none;">
+                    <div class="option-row">
+                        <label for="mouse-sensitivity">Mouse Sensitivity</label>
+                        <input type="range" id="mouse-sensitivity" data-setting="controls.mouseSensitivity" min="0.1" max="1" step="0.01">
+                        <span class="value-display">0.3</span>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="invert-y">Invert Y-Axis</label>
+                        <input type="checkbox" id="invert-y" data-setting="controls.invertY">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="auto-jump">Auto-Jump</label>
+                        <input type="checkbox" id="auto-jump" data-setting="controls.autoJump">
+                    </div>
+                    
+                    <div class="key-bindings">
+                        <h3>Key Bindings</h3>
+                        <div class="key-binding-row">
+                            <span>Forward</span>
+                            <button class="key-bind-button" data-action="forward">W</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Backward</span>
+                            <button class="key-bind-button" data-action="backward">S</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Left</span>
+                            <button class="key-bind-button" data-action="left">A</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Right</span>
+                            <button class="key-bind-button" data-action="right">D</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Jump</span>
+                            <button class="key-bind-button" data-action="jump">Space</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Sprint</span>
+                            <button class="key-bind-button" data-action="sprint">Shift</button>
+                        </div>
+                        <div class="key-binding-row">
+                            <span>Sneak</span>
+                            <button class="key-bind-button" data-action="sneak">Ctrl</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="audio-tab" style="display: none;">
+                    <div class="option-row">
+                        <label for="master-volume">Master Volume</label>
+                        <input type="range" id="master-volume" data-setting="audio.masterVolume" min="0" max="1" step="0.01">
+                        <span class="value-display">100%</span>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="music-volume">Music Volume</label>
+                        <input type="range" id="music-volume" data-setting="audio.musicVolume" min="0" max="1" step="0.01">
+                        <span class="value-display">70%</span>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="sfx-volume">Sound Effects</label>
+                        <input type="range" id="sfx-volume" data-setting="audio.sfxVolume" min="0" max="1" step="0.01">
+                        <span class="value-display">100%</span>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="ambient-volume">Ambient Sounds</label>
+                        <input type="range" id="ambient-volume" data-setting="audio.ambientVolume" min="0" max="1" step="0.01">
+                        <span class="value-display">50%</span>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="gameplay-tab" style="display: none;">
+                    <div class="option-row">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty" data-setting="gameplay.difficulty">
+                            <option value="peaceful">Peaceful</option>
+                            <option value="easy">Easy</option>
+                            <option value="normal">Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="show-coordinates">Show Coordinates</label>
+                        <input type="checkbox" id="show-coordinates" data-setting="gameplay.showCoordinates">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="creative-mode">Creative Mode</label>
+                        <input type="checkbox" id="creative-mode" data-setting="gameplay.creativeMode">
+                    </div>
+                    
+                    <div class="option-row">
+                        <label for="auto-save">Auto-Save Interval (minutes)</label>
+                        <input type="number" id="auto-save" data-setting="gameplay.autoSaveInterval" min="1" max="30" step="1">
+                    </div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button id="options-back" class="menu-button">Back</button>
+                    <button id="reset-options" class="menu-button">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HUD (Heads-Up Display) -->
+        <div id="hud" class="ui-screen">
+            <!-- Crosshair -->
+            <div id="crosshair">+</div>
+            
+            <!-- Health Bar -->
+            <div id="health-bar" class="status-bar">
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+                <div class="health-heart"></div>
+            </div>
+            
+            <!-- Hunger Bar -->
+            <div id="hunger-bar" class="status-bar">
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+                <div class="hunger-icon"></div>
+            </div>
+            
+            <!-- Hotbar -->
+            <div id="hotbar">
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+                <div class="hotbar-slot"></div>
+            </div>
+            
+            <!-- Debug Information -->
+            <div id="debug-info">
+                <div id="fps-counter">60 FPS</div>
+                <div id="coordinates">X: 0 Y: 0 Z: 0</div>
+            </div>
+        </div>
+        
+        <!-- Notifications Area -->
+        <div id="notifications"></div>
+    </div>
+    
+    <!-- Game Instructions - Shown when controls locked -->
+    <div id="instructions">
+        <h2>Click to play</h2>
+        <p>W, A, S, D = Move</p>
+        <p>SPACE = Jump</p>
+        <p>SHIFT = Sprint</p>
+        <p>CTRL = Sneak</p>
+        <p>Left Click = Break Block</p>
+        <p>Right Click = Place Block</p>
+        <p>1-9 = Select Hotbar Slot</p>
+        <p>E = Inventory</p>
+        <p>ESC = Pause</p>
+    </div>
+    
+    <!-- Load Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Load game application (ES6 module) -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html> 

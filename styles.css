@@ -1,33 +1,128 @@
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --accent-color: #FF9800;
+    --dark-color: #333333;
+    --light-color: #F5F5F5;
+    --ui-background: rgba(0, 0, 0, 0.7);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    --health-color: #f44336;
+    --hunger-color: #ff9800;
+    --item-highlight: rgba(255, 255, 255, 0.15);
+    --gui-scale: 1.0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body { 
     margin: 0; 
     overflow: hidden; 
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #000;
+    color: var(--light-color);
+    height: 100vh;
+    width: 100vw;
+    font-size: calc(16px * var(--gui-scale));
+    line-height: 1.6;
 }
 
 canvas { 
     display: block; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
 }
 
 #instructions {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.5);
+    background: var(--ui-background);
     color: white;
-    padding: 10px;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 80%;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--ui-border);
+}
+
+#instructions h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.controls div {
+    display: flex;
+    align-items: center;
+}
+
+.key {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    font-family: monospace;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+}
+
+#start-game {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
     border-radius: 5px;
-    z-index: 10;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#start-game:hover {
+    background: #43a047;
 }
 
 #crosshair {
     position: absolute;
     top: 50%;
     left: 50%;
+    transform: translate(-50%, -50%);
     width: 20px;
     height: 20px;
-    transform: translate(-50%, -50%);
     z-index: 5;
     pointer-events: none;
+    display: none;
 }
 
 #crosshair::before,
@@ -35,6 +130,7 @@ canvas {
     content: "";
     position: absolute;
     background: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 #crosshair::before {
@@ -51,13 +147,760 @@ canvas {
     top: 9px;
 }
 
+#game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+}
+
 #time-display {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(0,0,0,0.5);
+    background: var(--ui-background);
     color: white;
-    padding: 10px;
+    padding: 8px 12px;
     border-radius: 5px;
+    font-size: 1.2rem;
+    font-family: monospace;
+}
+
+#fps-counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--ui-background);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
+#selected-block {
+    position: absolute;
+    right: 10px;
+    bottom: 80px;
+    background: var(--ui-background);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+#health-bar,
+#hunger-bar {
+    position: absolute;
+    bottom: 60px;
+    height: 20px;
+    width: 200px;
+    background: var(--ui-background);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#health-bar {
+    left: 20px;
+}
+
+#hunger-bar {
+    right: 20px;
+}
+
+.health-inner {
+    background: var(--health-color);
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    transition: width 0.3s;
+}
+
+.hunger-inner {
+    background: var(--hunger-color);
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    transition: width 0.3s;
+}
+
+#hotbar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    background: var(--ui-background);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.hotbar-slot {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--ui-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.hotbar-slot.active {
+    background: var(--item-highlight);
+    border-color: white;
+}
+
+.hotbar-slot img {
+    max-width: 80%;
+    max-height: 80%;
+}
+
+.hotbar-slot .item-count {
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    font-size: 0.8rem;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+}
+
+#loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#loading-text {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+#loading-progress {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+#game-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--ui-background);
+    padding: 2rem;
+    border-radius: 10px;
+    z-index: 150;
+    min-width: 300px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--ui-border);
+}
+
+#game-menu h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+#game-menu button {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--ui-border);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 1rem;
+}
+
+#game-menu button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#resume-game {
+    background: var(--primary-color) !important;
+}
+
+#resume-game:hover {
+    background: #43a047 !important;
+}
+
+#exit-game {
+    background: rgba(220, 53, 69, 0.8) !important;
+}
+
+#exit-game:hover {
+    background: rgba(220, 53, 69, 1) !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .controls {
+        grid-template-columns: 1fr;
+    }
+    
+    #health-bar,
+    #hunger-bar {
+        width: 150px;
+    }
+    
+    .hotbar-slot {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    #instructions h2 {
+        font-size: 1.5rem;
+    }
+    
+    #game-overlay {
+        font-size: 0.9rem;
+    }
+    
+    #health-bar,
+    #hunger-bar {
+        width: 120px;
+    }
+    
+    .hotbar-slot {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-height: 600px) {
+    #health-bar,
+    #hunger-bar {
+        bottom: 50px;
+    }
+    
+    #hotbar {
+        bottom: 10px;
+    }
+}
+
+/* CSS Variables for consistent theming */
+:root {
+    /* Colors */
+    --primary-color: #4CAF50;
+    --secondary-color: #2196F3;
+    --accent-color: #FF9800;
+    --dark-color: #333333;
+    --light-color: #F5F5F5;
+    --ui-background: rgba(0, 0, 0, 0.7);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    
+    /* Game-specific colors */
+    --health-color: #f44336;
+    --hunger-color: #ff9800;
+    
+    /* Sizing */
+    --gui-scale: 1.0;
+}
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    font-size: calc(16px * var(--gui-scale));
+    line-height: 1.6;
+}
+
+/* Canvas (game renderer) */
+canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+/* Game container */
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* UI container - overlaid on top of the game */
+#ui-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(0px);
+}
+
+/* Common styles for UI screens */
+.ui-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--ui-background);
+    z-index: 20;
+    pointer-events: auto;
+}
+
+/* Menu content container */
+.menu-content {
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    padding: calc(20px * var(--gui-scale));
+    width: calc(500px * var(--gui-scale));
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Menu and button styles */
+.menu-content h1 {
+    font-size: calc(32px * var(--gui-scale));
+    margin-bottom: calc(20px * var(--gui-scale));
+    color: var(--primary-color);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: calc(10px * var(--gui-scale));
+    width: 100%;
+}
+
+.menu-button {
+    background-color: var(--dark-color);
+    color: #fff;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    padding: calc(10px * var(--gui-scale)) calc(20px * var(--gui-scale));
+    font-size: calc(18px * var(--gui-scale));
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+
+.menu-button:hover {
+    background-color: var(--primary-color);
+    transform: scale(1.02);
+}
+
+.menu-button:active {
+    transform: scale(0.98);
+}
+
+/* Loading screen styles */
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.progress-bar {
+    width: calc(400px * var(--gui-scale));
+    height: calc(20px * var(--gui-scale));
+    background-color: var(--dark-color);
+    border-radius: 10px;
+    margin: calc(20px * var(--gui-scale)) 0;
+    overflow: hidden;
+    border: 1px solid var(--ui-border);
+}
+
+.progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#loading-text {
+    font-size: calc(16px * var(--gui-scale));
+    color: #ccc;
+}
+
+/* Options menu styles */
+.options-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: calc(20px * var(--gui-scale));
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.tab-button {
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    padding: calc(10px * var(--gui-scale)) calc(15px * var(--gui-scale));
+    font-size: calc(16px * var(--gui-scale));
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.tab-button.active {
+    border-bottom: 2px solid var(--primary-color);
+    opacity: 1;
+}
+
+.tab-button:hover {
+    opacity: 1;
+}
+
+.tab-content {
+    margin-bottom: calc(20px * var(--gui-scale));
+    max-height: calc(400px * var(--gui-scale));
+    overflow-y: auto;
+}
+
+/* Options form controls */
+.option-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(15px * var(--gui-scale));
+    padding-bottom: calc(10px * var(--gui-scale));
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.option-row label {
+    flex: 1;
+    text-align: left;
+}
+
+.option-row input[type="range"] {
+    flex: 2;
+    margin: 0 calc(10px * var(--gui-scale));
+}
+
+.option-row .value-display {
+    width: calc(60px * var(--gui-scale));
+    text-align: right;
+}
+
+.option-row select,
+.option-row input[type="number"] {
+    padding: calc(5px * var(--gui-scale));
+    background-color: var(--dark-color);
+    color: #fff;
+    border: 1px solid var(--ui-border);
+    border-radius: 4px;
+}
+
+/* Key binding styles */
+.key-bindings {
+    margin-top: calc(20px * var(--gui-scale));
+}
+
+.key-bindings h3 {
+    margin-bottom: calc(10px * var(--gui-scale));
+    color: var(--secondary-color);
+}
+
+.key-binding-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(10px * var(--gui-scale));
+}
+
+.key-bind-button {
+    background-color: var(--dark-color);
+    border: 1px solid var(--ui-border);
+    color: #fff;
+    padding: calc(5px * var(--gui-scale)) calc(10px * var(--gui-scale));
+    min-width: calc(80px * var(--gui-scale));
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.key-bind-button:hover {
+    border-color: var(--secondary-color);
+}
+
+/* HUD styles */
+#hud {
+    pointer-events: none;
+    display: none;
+    background-color: transparent;
+}
+
+/* Crosshair */
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: calc(24px * var(--gui-scale));
+    color: white;
+    text-shadow: 0 0 2px black;
+}
+
+/* Health bar */
+#health-bar {
+    position: absolute;
+    bottom: calc(60px * var(--gui-scale));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: calc(5px * var(--gui-scale));
+}
+
+.health-heart {
+    width: calc(20px * var(--gui-scale));
+    height: calc(20px * var(--gui-scale));
+    background-color: var(--health-color);
+    clip-path: path('M10,1.5 C12.5,1.5 15,3.5 15,6.5 C15,10 12.5,13 10,16 C7.5,13 5,10 5,6.5 C5,3.5 7.5,1.5 10,1.5 Z');
+    transition: opacity 0.3s;
+}
+
+.health-heart.empty {
+    opacity: 0.4;
+}
+
+/* Hunger bar */
+#hunger-bar {
+    position: absolute;
+    bottom: calc(60px * var(--gui-scale));
+    right: calc(50% - (25px * 10 + 5px * 9) / 2);
+    display: flex;
+    gap: calc(5px * var(--gui-scale));
+}
+
+.hunger-icon {
+    width: calc(20px * var(--gui-scale));
+    height: calc(20px * var(--gui-scale));
+    background-color: var(--hunger-color);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    transition: opacity 0.3s;
+}
+
+.hunger-icon.empty {
+    opacity: 0.4;
+}
+
+/* Hotbar */
+#hotbar {
+    position: absolute;
+    bottom: calc(20px * var(--gui-scale));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: calc(4px * var(--gui-scale));
+}
+
+.hotbar-slot {
+    width: calc(40px * var(--gui-scale));
+    height: calc(40px * var(--gui-scale));
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #555;
+    border-radius: 3px;
+    transition: all 0.2s;
+    background-size: cover;
+    background-position: center;
+}
+
+.hotbar-slot.selected {
+    border-color: white;
+    transform: translateY(calc(-5px * var(--gui-scale)));
+}
+
+/* Debug information */
+#debug-info {
+    position: absolute;
+    top: calc(10px * var(--gui-scale));
+    left: calc(10px * var(--gui-scale));
+    font-family: monospace;
+    font-size: calc(14px * var(--gui-scale));
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: calc(5px * var(--gui-scale));
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: calc(5px * var(--gui-scale));
+}
+
+/* Notifications area */
+#notifications {
+    position: absolute;
+    top: calc(20px * var(--gui-scale));
+    right: calc(20px * var(--gui-scale));
+    max-width: calc(300px * var(--gui-scale));
+    display: flex;
+    flex-direction: column;
+    gap: calc(10px * var(--gui-scale));
+    pointer-events: none;
+}
+
+.notification {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-left: 4px solid var(--primary-color);
+    padding: calc(10px * var(--gui-scale)) calc(15px * var(--gui-scale));
+    border-radius: 3px;
+    font-size: calc(14px * var(--gui-scale));
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.hide {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+.notification-info {
+    border-left-color: var(--secondary-color);
+}
+
+.notification-warning {
+    border-left-color: var(--accent-color);
+}
+
+.notification-error {
+    border-left-color: var(--health-color);
+}
+
+/* Instructions panel */
+#instructions {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: calc(20px * var(--gui-scale));
+    border-radius: 8px;
+    text-align: center;
+    max-width: calc(400px * var(--gui-scale));
+    z-index: 5;
+}
+
+#instructions h2 {
+    margin-bottom: calc(15px * var(--gui-scale));
+    color: var(--primary-color);
+}
+
+#instructions p {
+    margin-bottom: calc(5px * var(--gui-scale));
+    font-size: calc(14px * var(--gui-scale));
+}
+
+/* Hide instructions when pointer is locked */
+:root:has(#game-container:fullscreen) #instructions,
+:root:has(body:fullscreen) #instructions {
+    display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    :root {
+        --gui-scale: 0.8;
+    }
+    
+    .menu-content {
+        padding: calc(15px * var(--gui-scale));
+        width: calc(400px * var(--gui-scale));
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --gui-scale: 0.7;
+    }
+    
+    .menu-content {
+        padding: calc(10px * var(--gui-scale));
+        width: calc(300px * var(--gui-scale));
+    }
+}
+
+/* Specific element customizations */
+.option-row input[type="checkbox"] {
+    width: calc(20px * var(--gui-scale));
+    height: calc(20px * var(--gui-scale));
+}
+
+button {
+    font-family: inherit;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: calc(10px * var(--gui-scale));
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
 } 

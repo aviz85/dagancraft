@@ -4,35 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Clone</title>
-    <!-- טעינת Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+    
     <!-- טעינת הסגנון -->
     <link rel="stylesheet" href="styles.css">
-    <!-- טעינת הקוד -->
-    <script src="js/utils/PointerLockControls.js"></script>
-    <script src="js/entities/Player.js"></script>
-    <script src="js/world/World.js"></script>
-    <script src="js/world/Sky.js"></script>
-    <script src="js/Game.js"></script>
+    
+    <!-- טעינת ספריות -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.0/dist/tweakpane.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    
+    <!-- מערכת משחק -->
+    <script type="module" src="js/app.js"></script>
 </head>
 <body>
-    <div id="instructions">
-        WASD - Move<br>
-        SPACE - Jump<br>
-        SHIFT - Crawl<br>
-        CLICK - Place/Remove Block<br>
-        F - Toggle view (First/Third person)<br>
-        ESC - Toggle mouse lock
+    <div id="ui-container">
+        <div id="instructions">
+            <h2>MineCraft Clone</h2>
+            <div class="controls">
+                <div><span class="key">WASD</span> - Move</div>
+                <div><span class="key">SPACE</span> - Jump</div>
+                <div><span class="key">SHIFT</span> - Crawl</div>
+                <div><span class="key">CLICK</span> - Place/Remove Block</div>
+                <div><span class="key">F</span> - Toggle view (First/Third person)</div>
+                <div><span class="key">E</span> - Inventory</div>
+                <div><span class="key">Q</span> - Drop Item</div>
+                <div><span class="key">ESC</span> - Menu / Mouse lock</div>
+            </div>
+            <button id="start-game">Start Game</button>
+        </div>
     </div>
     <div id="crosshair"></div>
-    <div id="time-display">00:00</div>
-
-    <script>
-        // התחלת המשחק כאשר כל הקבצים נטענו
-        document.addEventListener('DOMContentLoaded', () => {
-            const game = new Game();
-            game.init();
-        });
-    </script>
+    <div id="game-overlay">
+        <div id="time-display">00:00</div>
+        <div id="fps-counter">FPS: 60</div>
+        <div id="selected-block"></div>
+        <div id="health-bar">
+            <div class="health-inner"></div>
+        </div>
+        <div id="hunger-bar">
+            <div class="hunger-inner"></div>
+        </div>
+        <div id="hotbar"></div>
+    </div>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div id="loading-text">Loading Game Resources...</div>
+        <div id="loading-progress">0%</div>
+    </div>
+    <div id="game-menu" class="hidden">
+        <h2>Game Menu</h2>
+        <button id="resume-game">Resume Game</button>
+        <button id="options">Options</button>
+        <button id="save-world">Save World</button>
+        <button id="exit-game">Exit Game</button>
+    </div>
+    <canvas id="game-canvas"></canvas>
 </body>
 </html> 
