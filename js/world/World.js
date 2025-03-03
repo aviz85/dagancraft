@@ -655,10 +655,18 @@ export class World {
      * Ray casting to find the block the player is looking at
      * @param {THREE.Vector3} position - Player position
      * @param {THREE.Vector3} direction - Look direction
+     * @param {number} maxDistance - Maximum distance to check
      * @returns {Object} - Information about the targeted block or null
      */
-    getTargetBlock(position, direction) {
+    getTargetBlock(position, direction, maxDistance = 5) {
+        // Create a raycaster if it doesn't exist
+        if (!this.raycaster) {
+            this.raycaster = new THREE.Raycaster();
+            this.raycaster.far = maxDistance;
+        }
+        
         this.raycaster.set(position, direction.normalize());
+        this.raycaster.far = maxDistance; // Set the max distance
         
         // Find intersections with collidable objects
         const intersects = this.raycaster.intersectObjects(this.collidableObjects, false);
@@ -667,7 +675,7 @@ export class World {
             const intersection = intersects[0];
             
             // Check if intersection is within reach
-            if (intersection.distance <= this.maxReach) {
+            if (intersection.distance <= maxDistance) {
                 const block = intersection.object;
                 
                 // Calculate block position
@@ -942,5 +950,26 @@ export class World {
         
         // Update any dynamic world elements here
         // For example, water animation, day/night cycle, etc.
+    }
+
+    /**
+     * Check if there is a block below the given position
+     * @param {THREE.Vector3} position - The position to check below
+     * @returns {Object} - Object with isOnGround property and other info
+     */
+    isBlockBelow(position) {
+        // Get block coordinates below player
+        const blockX = Math.floor(position.x);
+        const blockY = Math.floor(position.y - 0.1); // Check slightly below player's feet
+        const blockZ = Math.floor(position.z);
+        
+        // Check if there is a solid block below
+        const isOnGround = this.isSolid(blockX, blockY, blockZ);
+        
+        return {
+            isOnGround: isOnGround,
+            blockType: this.getBlockAt(blockX, blockY, blockZ),
+            position: { x: blockX, y: blockY, z: blockZ }
+        };
     }
 } 

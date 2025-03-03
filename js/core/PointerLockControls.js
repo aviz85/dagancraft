@@ -21,7 +21,7 @@ export class PointerLockControls {
         this.applySettings();
         
         // Internal state
-        this.isLocked = false;           // Whether pointer is locked
+        this._isLocked = false;           // Whether pointer is locked
         this.euler = new THREE.Euler(0, 0, 0, 'YXZ');
         
         // Event binding
@@ -85,7 +85,7 @@ export class PointerLockControls {
      * @private
      */
     onMouseMove(event) {
-        if (!this.isLocked || !this.enabled) return;
+        if (!this._isLocked || !this.enabled) return;
         
         // Get motion from pointer lock API
         const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -116,11 +116,11 @@ export class PointerLockControls {
     onPointerlockChange() {
         if (document.pointerLockElement === this.domElement) {
             document.addEventListener('mousemove', this.onMouseMove);
-            this.isLocked = true;
+            this._isLocked = true;
             this.dispatchEvent({ type: 'lock' });
         } else {
             document.removeEventListener('mousemove', this.onMouseMove);
-            this.isLocked = false;
+            this._isLocked = false;
             this.dispatchEvent({ type: 'unlock' });
         }
     }
@@ -138,8 +138,11 @@ export class PointerLockControls {
      * Request pointer lock
      */
     lock() {
+        console.log('Attempting to lock pointer on element:', this.domElement);
         if (this.domElement.requestPointerLock) {
             this.domElement.requestPointerLock();
+        } else {
+            console.error('requestPointerLock not supported on this element');
         }
     }
     
@@ -156,7 +159,7 @@ export class PointerLockControls {
      * Toggle pointer lock
      */
     toggle() {
-        if (this.isLocked) {
+        if (this._isLocked) {
             this.unlock();
         } else {
             this.lock();
@@ -164,11 +167,19 @@ export class PointerLockControls {
     }
     
     /**
-     * Get current lock state
+     * Get the lock state
      * @returns {boolean} - Whether the pointer is locked
      */
     getLockState() {
-        return this.isLocked;
+        return this._isLocked;
+    }
+    
+    /**
+     * Get the camera object 
+     * @returns {THREE.Camera} - The camera object
+     */
+    getObject() {
+        return this.camera;
     }
     
     /**

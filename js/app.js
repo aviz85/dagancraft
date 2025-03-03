@@ -395,6 +395,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const app = new Application();
         app.init();
         
+        // Add direct click handler to instructions div for pointer lock
+        const instructionsElement = document.getElementById('instructions');
+        if (instructionsElement) {
+            instructionsElement.addEventListener('click', () => {
+                console.log('Instructions clicked, attempting to start game');
+                if (app.game) {
+                    app.game.controls.lock();
+                } else {
+                    // No game yet, start a new one
+                    app.startGame();
+                }
+            });
+        }
+        
         // Export application for debugging
         window.MinecraftClone = { Application, app };
         console.log('Application initialized successfully');
