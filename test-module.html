@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Test</title>
+    
+    <!-- Load Three.js before modules -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <h1>ES6 Module Loading Test</h1>
+    <div id="output"></div>
+    
+    <script type="module">
+        import { GameTest } from './js/game-module.js';
+        
+        // Log when script runs
+        console.log('Module script running');
+        document.getElementById('output').textContent = 'Loading module...';
+        
+        try {
+            // Test if THREE is available in this scope
+            console.log('THREE available in main script:', typeof THREE !== 'undefined');
+            
+            // Create game test instance
+            const gameTest = new GameTest();
+            const result = gameTest.test();
+            
+            document.getElementById('output').textContent = 'Module loaded successfully: ' + result;
+            console.log('Module test complete');
+        } catch (error) {
+            document.getElementById('output').textContent = 'Error: ' + error.message;
+            console.error('Error in module test:', error);
+        }
+    </script>
+</body>
+</html> 

@@ -2,6 +2,17 @@
  * Application - Main entry point for the game
  * Manages game state, loading assets, and UI interactions
  */
+
+// Check if THREE is available globally first
+if (typeof THREE === 'undefined') {
+    console.error('THREE.js library not found! Make sure it is loaded before this script.');
+    document.body.innerHTML = '<div style="color: red; padding: 20px; font-family: sans-serif;">' +
+        '<h1>Error: THREE.js not loaded</h1>' +
+        '<p>The THREE.js library could not be found. Please check that it is loaded before the app.js module.</p>' +
+        '</div>';
+    throw new Error('THREE.js library not found');
+}
+
 import { Game } from './Game.js';
 import { UIManager } from './ui/UIManager.js';
 import { ResourceManager } from './core/ResourceManager.js';
@@ -377,9 +388,22 @@ class Application {
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const app = new Application();
-    app.init();
+    console.log('DOM loaded, initializing application');
+    console.log('THREE.js version:', THREE.REVISION);
+    
+    try {
+        const app = new Application();
+        app.init();
+        
+        // Export application for debugging
+        window.MinecraftClone = { Application, app };
+        console.log('Application initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize application:', error);
+        document.body.innerHTML = '<div style="color: red; padding: 20px; font-family: sans-serif;">' +
+            '<h1>Error: Application initialization failed</h1>' +
+            '<p>Error details: ' + error.message + '</p>' +
+            '<p>Check the browser console for more information.</p>' +
+            '</div>';
+    }
 });
-
-// Export application for debugging
-window.MinecraftClone = { Application };
